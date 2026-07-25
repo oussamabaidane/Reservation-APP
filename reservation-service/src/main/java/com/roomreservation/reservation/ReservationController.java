@@ -1,8 +1,10 @@
 package com.roomreservation.reservation;
 
+import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,37 +18,41 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/reservations")
 public class ReservationController {
-    private final ReservationRepository repository;
     private final ReservationService service;
 
-    public ReservationController(ReservationRepository repository, ReservationService service) {
-        this.repository = repository;
+    public ReservationController(ReservationService service) {
         this.service = service;
     }
 
     @PostMapping
-    ReservationEntity create(@RequestBody ReservationEntity reservation) {
-        return service.create(reservation);
+    ResponseEntity<ReservationEntity> create(@Valid @RequestBody ReservationEntity reservation) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(reservation));
     }
 
     @GetMapping
-    List<ReservationEntity> findAll() {
-        return service.findAll();
+    List<ReservationEntity> findAll(@RequestParam(required = false) Long roomId,
+                                    @RequestParam(required = false) Long employeeId,
+                                    @RequestParam(required = false) LocalDate date,
+                                    @RequestParam(required = false) ReservationStatus status) {
+        if (roomId == null && employeeId == null && date == null && status == null) {
+            return service.findAll();
+        }
+        return service.search(roomId, employeeId, date, status);
     }
 
     @GetMapping("/{id}")
     ResponseEntity<ReservationEntity> findById(@PathVariable Long id) {
-        return repository.findById(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return ResponseEntity.ok(service.findById(id));
     }
 
     @GetMapping("/employee/{employeeId}")
     List<ReservationEntity> findByEmployee(@PathVariable Long employeeId) {
-        return repository.findByEmployeeId(employeeId);
+        return service.search(null, employeeId, null, null);
     }
 
     @GetMapping("/room/{roomId}")
     List<ReservationEntity> findByRoom(@PathVariable Long roomId) {
-        return repository.findByRoomId(roomId);
+        return service.search(roomId, null, null, null);
     }
 
     @GetMapping("/check-availability")
@@ -54,22 +60,16 @@ public class ReservationController {
                                            @RequestParam LocalDate date,
                                            @RequestParam LocalTime start,
                                            @RequestParam LocalTime end) {
-        ReservationEntity reservation = new ReservationEntity();
-        reservation.setRoomId(roomId);
-        reservation.setDateReservation(date);
-        reservation.setHeureDebut(start);
-        reservation.setHeureFin(end);
-        return new AvailabilityResponse(service.isAvailable(reservation));
+        boolean available = service.isAvailable(roomId, date, start, end);
+        String message = available ? "Room is available" : "Room already has a reservation in this time range";
+        return new AvailabilityResponse(available, message);
     }
 
     @PutMapping("/{id}/cancel")
     ResponseEntity<ReservationEntity> cancel(@PathVariable Long id) {
-        return repository.findById(id).map(reservation -> {
-            reservation.setStatut(ReservationStatus.ANNULEE);
-            return ResponseEntity.ok(repository.save(reservation));
-        }).orElseGet(() -> ResponseEntity.notFound().build());
+        return ResponseEntity.ok(service.cancel(id));
     }
 
-    record AvailabilityResponse(boolean available) {
+    record AvailabilityResponse(boolean available, String message) {
     }
 }
