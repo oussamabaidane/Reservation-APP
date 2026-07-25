@@ -13,7 +13,7 @@ Microservices starter architecture for a room reservation project.
 | Authentication | JWT + refresh token starter, BCrypt password hashing |
 | Internal messages | Internal events V1, no RabbitMQ for now |
 | Containers | Docker + Docker Compose |
-| CI/CD | GitLab CI |
+| CI/CD | GitHub Actions |
 | Quality | SonarQube |
 
 ## Architecture
@@ -22,10 +22,10 @@ Microservices starter architecture for a room reservation project.
 Local PC
    |
    v
-GitLab Repository
+GitHub Repository
    |
    v
-GitLab CI/CD
+GitHub Actions
    |
 Maven -> JUnit -> SonarQube
    |
@@ -85,6 +85,24 @@ mvn clean verify
 cd frontend
 npm install
 npm run build
+```
+
+## CI/CD
+
+GitHub Actions runs automatically on pushes and pull requests targeting `develop` or `main`.
+
+```text
+Maven + JUnit
+React + Vite build
+Optional SonarQube analysis
+Docker Compose validation and image build
+```
+
+To enable SonarQube, add these repository secrets:
+
+```text
+SONAR_HOST_URL
+SONAR_TOKEN
 ```
 
 ## Git Flow
