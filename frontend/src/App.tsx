@@ -741,8 +741,67 @@ function App() {
     })
   }
 
+  function logout() {
+    setSession(null)
+    setMessage('Pret')
+  }
+
+  if (!session) {
+    return (
+      <main className="login-page">
+        <section className="login-shell">
+          <div className="login-visual">
+            <div className="brand login-brand">
+              <span>RS</span>
+              <strong>Reservation APP</strong>
+            </div>
+            <p className="eyebrow">Systeme de reservation de salles</p>
+            <h1>Connexion</h1>
+            <p className="login-copy">Acces separe pour les employes et les administrateurs.</p>
+            <div className="login-demo-grid">
+              <button className="secondary-button" type="button" onClick={() => void quickLogin('EMPLOYE')}>
+                Employe demo
+              </button>
+              <button className="secondary-button" type="button" onClick={() => void quickLogin('ADMINISTRATEUR')}>
+                Admin demo
+              </button>
+            </div>
+            <div className="service-state login-state">
+              <span className={apiOnline ? 'dot online-dot' : 'dot offline-dot'} />
+              {apiOnline ? 'Services connectes' : 'Mode demo'}
+            </div>
+          </div>
+
+          <form className="login-card" onSubmit={submitLogin}>
+            <div>
+              <p className="eyebrow">Authentification</p>
+              <h2>Se connecter</h2>
+            </div>
+            <label>
+              Email
+              <input value={loginEmail} onChange={(event) => setLoginEmail(event.target.value)} />
+            </label>
+            <label>
+              Mot de passe
+              <input type="password" value={loginPassword} onChange={(event) => setLoginPassword(event.target.value)} />
+            </label>
+            <button type="submit" disabled={saving}>
+              {saving ? 'Connexion...' : 'Connexion'}
+            </button>
+            <p className="form-message">{message}</p>
+          </form>
+        </section>
+      </main>
+    )
+  }
+
+  const visibleActiveReservations = displayedReservations.filter((reservation) => reservation.statut !== 'ANNULEE')
+  const visibleBookedHours = Math.round(
+    (visibleActiveReservations.reduce((sum, reservation) => sum + (reservation.dureeMinutes ?? 0), 0) / 60) * 10,
+  ) / 10
+
   return (
-    <main className="app-shell">
+    <main className={`app-shell ${isAdmin ? 'admin-shell' : 'employee-shell'}`}>
       <aside className="sidebar" aria-label="Navigation">
         <div className="brand">
           <span>RS</span>
@@ -750,10 +809,10 @@ function App() {
         </div>
         <nav>
           <a href="#dashboard">Dashboard</a>
-          <a href="#rooms">Salles</a>
-          <a href="#reservations">Reservations</a>
+          {!isAdmin && <a href="#rooms">Recherche</a>}
+          <a href="#reservations">{isAdmin ? 'Reservations' : 'Mes reservations'}</a>
           {isAdmin && <a href="#admin">Administration</a>}
-          <a href="#audit">Audit</a>
+          <a href={isAdmin ? '#audit' : '#notifications'}>{isAdmin ? 'Audit' : 'Notifications'}</a>
         </nav>
         <div className="service-state">
           <span className={apiOnline ? 'dot online-dot' : 'dot offline-dot'} />
@@ -764,44 +823,19 @@ function App() {
       <section className="workspace" id="dashboard">
         <header className="topbar">
           <div>
-            <p className="eyebrow">Systeme de reservation de salles</p>
-            <h1>Gestion des salles, employes et reservations</h1>
+            <p className="eyebrow">{isAdmin ? 'Interface administrateur' : 'Interface employe'}</p>
+            <h1>{isAdmin ? 'Administration du systeme' : 'Espace employe'}</h1>
+            <span className={`role-chip ${isAdmin ? 'admin-chip' : ''}`}>{session.fullName}</span>
           </div>
           <div className="topbar-actions">
             <button className="secondary-button" type="button" onClick={() => void loadData()} disabled={loading}>
               {loading ? 'Chargement...' : 'Rafraichir'}
             </button>
+            <button className="secondary-button logout-button" type="button" onClick={logout}>
+              Deconnexion
+            </button>
           </div>
         </header>
-
-        <section className="session-band">
-          <form className="login-form" onSubmit={submitLogin}>
-            <label>
-              Email
-              <input value={loginEmail} onChange={(event) => setLoginEmail(event.target.value)} />
-            </label>
-            <label>
-              Mot de passe
-              <input type="password" value={loginPassword} onChange={(event) => setLoginPassword(event.target.value)} />
-            </label>
-            <button type="submit" disabled={saving}>
-              Connexion
-            </button>
-            <button className="secondary-button" type="button" onClick={() => void quickLogin('EMPLOYE')}>
-              Employe demo
-            </button>
-            <button className="secondary-button" type="button" onClick={() => void quickLogin('ADMINISTRATEUR')}>
-              Admin demo
-            </button>
-          </form>
-          <div className="session-summary">
-            <span className={`role-chip ${session?.role === 'ADMINISTRATEUR' ? 'admin-chip' : ''}`}>
-              {session?.role ?? 'NON_CONNECTE'}
-            </span>
-            <strong>{session?.fullName ?? 'Aucun utilisateur'}</strong>
-            <small>{message}</small>
-          </div>
-        </section>
 
         <section className="metrics" aria-label="Synthese">
           <article className="metric">
@@ -809,24 +843,25 @@ function App() {
             <strong>{totals.activeRooms}</strong>
           </article>
           <article className="metric">
-            <span>Reservations actives</span>
-            <strong>{totals.activeReservations}</strong>
+            <span>{isAdmin ? 'Reservations actives' : 'Mes reservations'}</span>
+            <strong>{isAdmin ? totals.activeReservations : displayedReservations.length}</strong>
           </article>
           <article className="metric">
-            <span>Heures reservees</span>
-            <strong>{totals.bookedHours}</strong>
+            <span>{isAdmin ? 'Heures reservees' : 'Mes heures'}</span>
+            <strong>{isAdmin ? totals.bookedHours : visibleBookedHours}</strong>
           </article>
           <article className="metric">
             <span>Notifications</span>
             <strong>{totals.unread}</strong>
           </article>
           <article className="metric">
-            <span>Employes actifs</span>
-            <strong>{totals.employees}</strong>
+            <span>{isAdmin ? 'Employes actifs' : 'Reservations actives'}</span>
+            <strong>{isAdmin ? totals.employees : visibleActiveReservations.length}</strong>
           </article>
         </section>
 
-        <section className="work-grid">
+        {!isAdmin && (
+        <section className="work-grid employee-grid">
           <section className="panel" id="rooms">
             <div className="panel-header">
               <div>
@@ -888,7 +923,7 @@ function App() {
                     <div>
                       <strong>{roomName(room)}</strong>
                       <span>
-                        {roomTypeLabel(room.type)} · {room.capaciteMaximale} places · {room.localisation || '-'}
+                        {roomTypeLabel(room.type)} / {room.capaciteMaximale} places / {room.localisation || '-'}
                       </span>
                     </div>
                     <div className="row-actions">
@@ -985,6 +1020,7 @@ function App() {
             <img className="floor-plan" src={floorPlan} alt="Plan des salles" />
           </section>
         </section>
+        )}
 
         <section className="panel" id="reservations">
           <div className="panel-header">
@@ -1189,8 +1225,8 @@ function App() {
           </section>
         )}
 
-        <section className="bottom-grid" id="audit">
-          <section className="panel">
+        <section className="bottom-grid" id={isAdmin ? 'audit' : 'notifications'}>
+          <section className="panel" id="notifications">
             <div className="panel-header">
               <div>
                 <h2>Notifications</h2>
@@ -1217,6 +1253,7 @@ function App() {
             </div>
           </section>
 
+          {isAdmin ? (
           <section className="panel">
             <div className="panel-header">
               <div>
@@ -1229,7 +1266,7 @@ function App() {
                 <article className="audit-row" key={log.id ?? `${log.action}-${log.dateAction}`}>
                   <strong>{log.action}</strong>
                   <span>
-                    User {log.utilisateurId} · {log.adresseIp || 'system'}
+                    User {log.utilisateurId} / {log.adresseIp || 'system'}
                   </span>
                 </article>
               ))}
@@ -1242,6 +1279,21 @@ function App() {
               ))}
             </div>
           </section>
+          ) : (
+          <section className="panel account-panel">
+            <div className="panel-header">
+              <div>
+                <h2>Compte employe</h2>
+                <span>{session.email}</span>
+              </div>
+            </div>
+            <div className="summary-list">
+              <span>Role: {session.role}</span>
+              <span>Reservations visibles: {displayedReservations.length}</span>
+              <span>Dernier statut: {message}</span>
+            </div>
+          </section>
+          )}
         </section>
       </section>
     </main>
