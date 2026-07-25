@@ -18,6 +18,7 @@ public class StatisticsController {
     Map<String, Long> statistics() {
         return Map.of(
                 "notifications", notificationRepository.count(),
+                "unreadNotifications", notificationRepository.countByLueFalse(),
                 "auditLogs", auditLogRepository.count()
         );
     }

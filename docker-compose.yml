@@ -58,6 +58,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: reservation
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
+      NOTIFICATION_AUDIT_SERVICE_URL: http://notification-audit-service:8084
     depends_on:
       - reservation-db
       - redis

@@ -24,6 +24,11 @@ public class NotificationController {
         return repository.save(notification);
     }
 
+    @GetMapping
+    List<NotificationEntity> findAll() {
+        return repository.findAll();
+    }
+
     @GetMapping("/user/{userId}")
     List<NotificationEntity> findByUser(@PathVariable Long userId) {
         return repository.findByDestinataireId(userId);

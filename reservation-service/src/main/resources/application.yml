@@ -22,3 +22,6 @@ management:
     web:
       exposure:
         include: health,info
+
+app:
+  notification-audit-url: ${NOTIFICATION_AUDIT_SERVICE_URL:http://localhost:8084}
