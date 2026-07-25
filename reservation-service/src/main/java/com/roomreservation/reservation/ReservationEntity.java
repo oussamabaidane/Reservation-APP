@@ -6,6 +6,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -16,12 +19,26 @@ public class ReservationEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
+    @Positive
     private Long employeeId;
+
+    @NotNull
+    @Positive
     private Long roomId;
+
+    @NotNull
     private LocalDate dateReservation;
+
+    @NotNull
     private LocalTime heureDebut;
+
+    @NotNull
     private LocalTime heureFin;
+
     private Integer dureeMinutes;
+
+    @Size(max = 180)
     private String motif;
 
     @Enumerated(EnumType.STRING)
@@ -99,5 +116,9 @@ public class ReservationEntity {
 
     public LocalDateTime getDateCreation() {
         return dateCreation;
+    }
+
+    public void setDateCreation(LocalDateTime dateCreation) {
+        this.dateCreation = dateCreation;
     }
 }

@@ -1,13 +1,13 @@
 .app-shell {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 260px minmax(0, 1fr);
-  background: #eef2f7;
-  color: #172033;
+  grid-template-columns: 248px minmax(0, 1fr);
+  background: #f4f6f9;
+  color: #1f2937;
 }
 
 .sidebar {
-  background: #172033;
+  background: #202936;
   color: #ffffff;
   padding: 24px 18px;
 }
@@ -24,7 +24,7 @@
 }
 
 .sidebar a {
-  color: #dbeafe;
+  color: #dce7f3;
   text-decoration: none;
   padding: 10px 12px;
   border-radius: 6px;
@@ -35,6 +35,7 @@
 }
 
 .workspace {
+  min-width: 0;
   padding: 24px;
 }
 
@@ -48,7 +49,7 @@
 
 .eyebrow {
   margin: 0 0 4px;
-  color: #58657a;
+  color: #64748b;
   font-size: 13px;
   text-transform: uppercase;
   font-weight: 700;
@@ -69,17 +70,31 @@ h2 {
 }
 
 button {
+  min-height: 40px;
   border: 0;
   border-radius: 6px;
   padding: 10px 14px;
-  background: #2563eb;
+  background: #0f766e;
   color: #ffffff;
   font-weight: 700;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.secondary-button {
+  min-height: 34px;
+  padding: 7px 10px;
+  background: #475569;
+  font-size: 13px;
 }
 
 .metrics {
   display: grid;
-  grid-template-columns: repeat(5, minmax(140px, 1fr));
+  grid-template-columns: repeat(4, minmax(150px, 1fr));
   gap: 12px;
   margin-bottom: 16px;
 }
@@ -87,34 +102,40 @@ button {
 .metric,
 .panel {
   background: #ffffff;
-  border: 1px solid #d7dee8;
+  border: 1px solid #d9e1ea;
   border-radius: 8px;
 }
 
 .metric {
-  min-height: 82px;
+  min-height: 92px;
   display: grid;
-  gap: 4px;
+  gap: 6px;
   align-content: center;
   padding: 14px;
 }
 
-.metric span:last-child {
+.metric-label {
   color: #64748b;
   font-size: 13px;
 }
 
-.status-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #16a34a;
+.metric strong {
+  font-size: 27px;
+}
+
+.online {
+  color: #15803d;
+}
+
+.offline {
+  color: #b91c1c;
 }
 
 .content-grid {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
+  grid-template-columns: minmax(320px, 0.95fr) minmax(360px, 1.05fr);
   gap: 16px;
+  margin-bottom: 16px;
 }
 
 .panel {
@@ -122,6 +143,7 @@ button {
 }
 
 .panel-header {
+  min-height: 62px;
   padding: 16px;
   border-bottom: 1px solid #e2e8f0;
   display: flex;
@@ -135,14 +157,55 @@ button {
   font-size: 13px;
 }
 
-.panel img {
+.reservation-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  padding: 16px;
+}
+
+.reservation-form label {
+  display: grid;
+  gap: 6px;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.reservation-form input {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 9px 10px;
+  color: #1f2937;
+  font: inherit;
+}
+
+.wide-field,
+.reservation-form button {
+  grid-column: 1 / -1;
+}
+
+.floor-panel img {
   display: block;
   width: 100%;
-  height: auto;
+  height: 337px;
+  object-fit: cover;
+  background: #f8fafc;
+}
+
+.reservations-panel {
+  margin-bottom: 16px;
+}
+
+.table-wrap {
+  overflow-x: auto;
 }
 
 table {
   width: 100%;
+  min-width: 900px;
   border-collapse: collapse;
 }
 
@@ -152,6 +215,7 @@ td {
   padding: 12px 14px;
   border-bottom: 1px solid #e2e8f0;
   font-size: 14px;
+  white-space: nowrap;
 }
 
 th {
@@ -159,7 +223,56 @@ th {
   background: #f8fafc;
 }
 
-@media (max-width: 980px) {
+.status-pill {
+  display: inline-flex;
+  min-width: 96px;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.confirmee {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.en_attente {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.annulee {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.terminee {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.service-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.service-strip span {
+  border: 1px solid #d9e1ea;
+  border-radius: 999px;
+  background: #ffffff;
+  padding: 8px 11px;
+  color: #475569;
+  font-size: 13px;
+}
+
+.service-strip strong {
+  color: #1f2937;
+}
+
+@media (max-width: 1080px) {
   .app-shell {
     grid-template-columns: 1fr;
   }
@@ -168,14 +281,32 @@ th {
     display: none;
   }
 
+  .metrics,
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .workspace {
+    padding: 16px;
+  }
+
   .topbar,
   .panel-header {
     align-items: flex-start;
     flex-direction: column;
   }
 
-  .metrics,
-  .content-grid {
+  h1 {
+    font-size: 24px;
+  }
+
+  .reservation-form {
     grid-template-columns: 1fr;
+  }
+
+  .floor-panel img {
+    height: 240px;
   }
 }
