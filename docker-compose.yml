@@ -75,7 +75,7 @@ services:
       - notification-db
 
   identity-db:
-    image: postgres:18-alpine
+    image: postgres:16-alpine
     container_name: rr-identity-db
     environment:
       POSTGRES_DB: identity_db
@@ -87,7 +87,7 @@ services:
       - identity_db_data:/var/lib/postgresql/data
 
   room-db:
-    image: postgres:18-alpine
+    image: postgres:16-alpine
     container_name: rr-room-db
     environment:
       POSTGRES_DB: room_db
@@ -99,7 +99,7 @@ services:
       - room_db_data:/var/lib/postgresql/data
 
   reservation-db:
-    image: postgres:18-alpine
+    image: postgres:16-alpine
     container_name: rr-reservation-db
     environment:
       POSTGRES_DB: reservation_db
@@ -111,7 +111,7 @@ services:
       - reservation_db_data:/var/lib/postgresql/data
 
   notification-db:
-    image: postgres:18-alpine
+    image: postgres:16-alpine
     container_name: rr-notification-db
     environment:
       POSTGRES_DB: notification_db
