@@ -43,10 +43,17 @@ public class AuthController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
 
+        if (!employee.isActif()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Account is disabled");
+        }
+
         return new LoginResponse(
                 "demo-jwt-" + employee.getId() + "-" + Instant.now().getEpochSecond(),
                 "refresh-" + UUID.randomUUID(),
-                employee.getRole().name()
+                employee.getRole().name(),
+                employee.getId(),
+                employee.getPrenom() + " " + employee.getNom(),
+                employee.getEmail()
         );
     }
 
@@ -55,7 +62,7 @@ public class AuthController {
         if (request.refreshToken() == null || request.refreshToken().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Refresh token is required");
         }
-        return new LoginResponse("demo-jwt-refreshed-" + Instant.now().getEpochSecond(), request.refreshToken(), "EMPLOYE");
+        return new LoginResponse("demo-jwt-refreshed-" + Instant.now().getEpochSecond(), request.refreshToken(), "EMPLOYE", null, null, null);
     }
 
     record RegisterRequest(String numeroEmploye, String nom, String prenom, String email, String password, String departement, Role role) {
@@ -67,6 +74,6 @@ public class AuthController {
     record RefreshRequest(String refreshToken) {
     }
 
-    record LoginResponse(String accessToken, String refreshToken, String role) {
+    record LoginResponse(String accessToken, String refreshToken, String role, Long employeeId, String fullName, String email) {
     }
 }
