@@ -13,8 +13,9 @@ Microservices starter architecture for a room reservation project.
 | Authentication | JWT + refresh token starter, BCrypt password hashing |
 | Internal messages | Internal events V1, no RabbitMQ for now |
 | Containers | Docker + Docker Compose |
-| CI/CD | GitHub Actions |
+| CI/CD | GitHub Actions + Jenkins |
 | Quality | SonarQube |
+| Monitoring | Prometheus + Grafana |
 
 ## Architecture
 
@@ -25,7 +26,7 @@ Local PC
 GitHub Repository
    |
    v
-GitHub Actions
+GitHub Actions / Jenkins
    |
 Maven -> JUnit -> SonarQube
    |
@@ -56,6 +57,10 @@ Service                            Service      Audit Service
 | Reservation Service | 8083 | Availability, conflict detection, Redis locks |
 | Notification & Audit Service | 8084 | Notifications, audit logs, statistics |
 | Frontend | 8085 | React + Vite web app |
+| Jenkins | 8086 | Local CI/CD pipeline runner |
+| SonarQube | 9000 | Code quality dashboard |
+| Prometheus | 9090 | Metrics collection |
+| Grafana | 3000 | Monitoring dashboards |
 
 ## Run Locally
 
@@ -98,12 +103,40 @@ Optional SonarQube analysis
 Docker Compose validation and image build
 ```
 
+Jenkins can also run the local `Jenkinsfile` pipeline:
+
+```text
+Backend - Maven + JUnit
+Frontend - React + Vite
+SonarQube Analysis
+Docker Compose Validation
+```
+
 To enable SonarQube, add these repository secrets:
 
 ```text
 SONAR_HOST_URL
 SONAR_TOKEN
 ```
+
+## DevOps And Monitoring
+
+Start the local DevOps stack:
+
+```bash
+docker compose up -d prometheus grafana jenkins sonarqube sonar-db
+```
+
+Local URLs:
+
+```text
+Grafana:    http://localhost:3000  admin / admin
+Prometheus: http://localhost:9090
+Jenkins:    http://localhost:8086
+SonarQube:  http://localhost:9000  admin / admin
+```
+
+More details: `devops/README.md`
 
 ## Git Flow
 
